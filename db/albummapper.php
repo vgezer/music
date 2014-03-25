@@ -247,4 +247,51 @@ class AlbumMapper extends Mapper {
 		$params = array($userId, $name);
 		return $this->findEntities($sql, $params);
 	}
+	/**
+	 * overwrite Mapper implementation to search for shared files
+	 * @param string $sql the prepare string
+	 * @param array $params the params which should replace the ? in the sql query
+	 * @param int $limit the maximum number of rows
+	 * @param int $offset from which row we want to start
+	 * @return array all fetched entities
+	 */
+	protected function findEntities($sql, array $params=array(), $limit=null, $offset=null) {
+		$result = $this->execute($sql, $params, $limit, $offset);
+
+		$imageFiles = null;
+		
+		$entities = array();
+		while($row = $result->fetchRow()){
+			//check if we need to fix the coverFilePath
+			if (isset($row['coverFilePath'])) {
+				//lazy load images
+				if ($imageFiles === null) {
+					$imageFiles = $this->getSharedImageFiles();
+				}
+				
+				if (isset($imageFiles[$row['cover_file_id']])) {
+					//update path with shared path
+					$row['coverFilePath'] = $imageFiles[$row['cover_file_id']]['path'];
+				}
+				
+			}
+			$entity = $this->mapRowToEntity($row);
+			array_push($entities, $entity);
+		}
+		
+		return $entities;
+	}
+	
+	private function getSharedImageFiles() {
+		$result = array();
+		
+		$images = $this->api->searchByMime('image');
+		
+		//remap array, to allow lookup of files by fileid
+		foreach ($images as $file){
+			$result[$file['fileid']] = $file;
+		}
+		
+		return $result;
+	}
 }
