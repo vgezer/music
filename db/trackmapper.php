@@ -149,5 +149,4 @@ class TrackMapper extends Mapper {
 		$params = array($userId, $name, $name, $name);
 		return $this->findEntities($sql, $params);
 	}
-
 }
