@@ -200,8 +200,7 @@ class Scanner extends PublicEmitter {
 	 * @param string $path the path of the file
 	 */
 	public function deleteByPath($path){
-		$metadata = $this->api->getFileInfo($path);
-		$fileId = (int)$metadata['fileid'];
+		$fileId = $this->api->getFileInfo($path)->getId();
 		$this->emit('\OCA\Music\Utility\Scanner', 'delete', array($fileId, null));
 		$this->delete($fileId);
 	}
