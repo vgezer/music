@@ -1114,7 +1114,7 @@ class APIControllerTest extends ControllerTestUtility {
 			'artistId' => 3,
 			'albumId' => 1,
 			'files' => array(
-				'audio/mp3' => $filePath
+				'audio/mp3' => false  // strstr on a number with needle '/' results in false (see toCollection of class Track)
 			)
 		);
 
