@@ -149,50 +149,5 @@ class TrackMapper extends Mapper {
 		$params = array($userId, $name, $name, $name);
 		return $this->findEntities($sql, $params);
 	}
-	
-	/**
-	 * overwrite Mapper implementation to search for shared files
-	 * @param string $sql the prepare string
-	 * @param array $params the params which should replace the ? in the sql query
-	 * @param int $limit the maximum number of rows
-	 * @param int $offset from which row we want to start
-	 * @return array all fetched entities
-	 */
-	protected function findEntities($sql, array $params=array(), $limit=null, $offset=null) {
-		$result = $this->execute($sql, $params, $limit, $offset);
 
-		$audioFiles = $this->getSharedAudioFiles();
-		
-		$entities = array();
-		while($row = $result->fetchRow()){
-			if (isset($audioFiles[$row['file_id']])) {
-				//update path with shared path
-				$row['filePath'] = $audioFiles[$row['file_id']]['path'];
-			}
-			$entity = $this->mapRowToEntity($row);
-			array_push($entities, $entity);
-		}
-		
-		return $entities;
-	}
-	
-	private function getSharedAudioFiles() {
-		$result = array();
-		
-		$audio = $this->api->searchByMime('audio');
-		
-		//remap array, to allow lookup of files by fileid
-		foreach ($audio as $file){
-			$result[$file['fileid']] = $file;
-		}
-		
-		$ogg = $this->api->searchByMime('application/ogg');
-		
-		//remap array, to allow lookup of files by fileid
-		foreach ($ogg as $file){
-			$result[$file['fileid']] = $file;
-		}
-		
-		return $result;
-	}
 }

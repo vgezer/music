@@ -90,7 +90,7 @@ class Track extends Entity {
 			'albumId' => $this->getAlbumId(),
 			'files' => array($this->getMimetype() => $api->linkToRoute(
 				'download',
-				array('file' => strstr($this->getFilePath(),'/'))
+				array('file' => strstr($api->getView()->getPath($this->getFileId()),'/'))
 			)),
 			'id' => $this->getId(),
 		);
